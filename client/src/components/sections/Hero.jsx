@@ -25,26 +25,19 @@ export default function Hero() {
         transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* Sur mobile : flex en colonne, l'ordre du DOM ci-dessous (texte → photo → CTA/réseaux)
+      {/* Sur mobile : flex en colonne, l'ordre du DOM ci-dessous (titre/poste → photo → CTA/réseaux)
           détermine directement l'affichage. Sur md+ : grille 2 colonnes, la photo
           (col 2) s'étire sur les 2 lignes et reste centrée verticalement à côté du texte. */}
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-5 sm:px-8 md:grid md:grid-cols-[1.3fr_0.7fr] md:grid-rows-[auto_auto] md:items-center md:gap-x-10 md:gap-y-6">
         <div className="md:col-start-1 md:row-start-1">
           <Reveal>
-            <p className="mb-3 text-sm text-sage">{subtitle}</p>
-          </Reveal>
-
-          <Reveal delay={0.1}>
             <h1 className="max-w-[12ch] font-display text-4xl leading-[1.05] text-white sm:text-5xl md:text-6xl">
               {profile?.full_name || 'Mon Nom'}
             </h1>
           </Reveal>
 
-          <Reveal delay={0.2}>
-            <p className="mt-5 max-w-[46ch] text-base leading-relaxed text-slate-400">
-              {profile?.bio ||
-                "Je construis des produits web clairs, rapides et faciles à maintenir."}
-            </p>
+          <Reveal delay={0.1}>
+            <p className="mt-3 text-sm text-sage">{subtitle}</p>
           </Reveal>
         </div>
 
