@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0B1420;
+  --color-ink-2: #101C2C;
+  --color-gold: #E8A33D;
+  --color-sage: #6FB98F;
+  --font-display: "Fraunces", serif;
+  --font-sans: "Inter", sans-serif;
+}
