@@ -1,23 +1,23 @@
 FROM node:20-slim
 
-# Librairies système requises par Chromium (Puppeteer) — absentes par défaut
-# sur les images Linux légères, sans elles le PDF échoue silencieusement.
-RUN apt-get update && apt-get install -y \
-    ca-certificates fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 \
-    libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 \
-    libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 \
-    libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
-    libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 \
-    libxss1 libxtst6 lsb-release wget xdg-utils \
-    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# Installe Google Chrome directement via apt (plus fiable que le téléchargeur
+# intégré de Puppeteer, qui échoue parfois selon l'environnement réseau du build).
+RUN apt-get update && apt-get install -y wget gnupg ca-certificates --no-install-recommends \
+    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# Empêche Puppeteer de télécharger son propre Chromium au npm install —
+# on utilise le Chrome système installé ci-dessus à la place.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-
-# Force Puppeteer à télécharger Chromium pendant le build (pas au runtime)
-RUN npx puppeteer browsers install chrome
 
 EXPOSE 5000
 CMD ["node", "server.js"]

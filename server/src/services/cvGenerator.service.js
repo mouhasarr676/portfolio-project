@@ -12,6 +12,11 @@ export async function generateCvPdf(data) {
 
   const browser = await puppeteer.launch({
     headless: true,
+    // En production (Docker/Render), utilise le Chrome système installé via apt
+    // (voir Dockerfile) plutôt que le Chromium bundlé de Puppeteer. En local,
+    // cette variable n'existe pas, donc Puppeteer utilise son propre Chromium
+    // téléchargé normalement lors du npm install local.
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
@@ -25,9 +30,6 @@ export async function generateCvPdf(data) {
       preferCSSPageSize: true,
     });
 
-    // Depuis Puppeteer v23+, page.pdf() renvoie un Uint8Array et non un Buffer Node.js.
-    // Express corrompt silencieusement la réponse si on lui passe autre chose qu'un vrai
-    // Buffer (il le traite comme du JSON) — conversion explicite obligatoire ici.
     return Buffer.from(pdfUint8Array);
   } finally {
     await browser.close();
