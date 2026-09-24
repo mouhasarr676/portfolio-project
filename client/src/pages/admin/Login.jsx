@@ -18,8 +18,14 @@ export default function Login() {
     try {
       await login(email, password);
       navigate('/admin');
-    } catch (err) {
-      setError('Identifiants incorrects');
+        } catch (err) {
+      if (err.message?.includes('NETWORK') || err.message === 'Failed to fetch') {
+        setError('Problème de connexion réseau — vérifie ta connexion et réessaie.');
+      } else if (err.message?.includes('Invalid login credentials')) {
+        setError('Email ou mot de passe incorrect.');
+      } else {
+        setError(err.message || 'Une erreur est survenue, réessaie.');
+      }
     } finally {
       setLoading(false);
     }
